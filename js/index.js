@@ -6,17 +6,18 @@ $(document).ready(
     let canales = (JSON.parse(localStorage.getItem('marcadores')) || []);
     let predefinidos = (JSON.parse(localStorage.getItem('predefinidos')) || []);
 
-    //JS de Marialize
-    //Activa el menú desplegable al usarse en pantallas pequeñas
+    /////*******JS de Marialize********\\\\\\
+
 
     $('.sidenav').sidenav();
     $('.modal').modal();
     $('.tabs').tabs();
     $('select').formSelect();
     $(".dropdown-trigger").dropdown();
-
     $('#select_canal').formSelect();
 
+    var modal_predeterminados = M.Modal.getInstance($('#modal_predeterminados'));
+    var modal_editar = M.Modal.getInstance($('#modal_editar_nombre'));
 
 
     $('[id^="menu_"]').each(function () {
@@ -34,22 +35,23 @@ $(document).ready(
     $(".panel").hide();
 
 
+    //Funcion simple para abrir el modal al pulsar en el elemento de la lista con dicho id
+    $('#menu_favoritos').on('click', function(){
+      modal_predeterminados.open();
+    });
 
-    /*
-    let modal_alimentadores = M.Modal.getInstance($('#alimentadores'));
-    let select_alimentadores = M.FormSelect.init($('#select_canal'));
 
-    */
-
-    $('#canales').on('click', function(){
-
-      modal_alimentadores.open();
-
+    $('#boton_editar').on('click', function(){
+      modal_editar.open();
     });
 
 
 
-    ////*******\\\\\
+
+
+
+
+    ////****Fin de js de materialize****\\\\\
 
 
     // Cargamos 10 canales por defecto si es la primera vez que se inicia la aplicación
@@ -127,33 +129,24 @@ $(document).ready(
     // definimos la función cargarCanales()
     // esta función carga de localStorage los canales disponibles y
     // actualiza el SELECT con la lista de canales
-    function cargarCanales(){
+    function cargarCanalesPredefinidos(){
       let select = $('#select_canal');
-      let panel = $('#panel_alimentadores');
-      if(canales.length == 0){
-        panel.append('<h3 class="center">Aun no se ha añadido ningún alimentador a favoritos</h3>')
-      }
-
-    select.empty();
-    let opcion = '';
+      select.empty();
+      let opcion = '';
       for (let i=0; i< predefinidos.length; i++) {
-        console.log(predefinidos[i].nombre);
-         opcion += '<option value="'+i+'">'+predefinidos[i].nombre+'</option>';
-
-
+        opcion += '<option value="'+i+'">'+predefinidos[i].nombre+'</option>';
       }
-        select.html(opcion);
-
+      select.html(opcion);
 
     }
     // llamamos a la función para forzar su ejecución al cargar la página
-    cargarCanales();
+    cargarCanalesPredefinidos();
 
     // mostrar un canal del array
     function mostrarCanal(posicion){
-      canales = (JSON.parse(localStorage.getItem('marcadores')));
+      let consultar_canal = (JSON.parse(localStorage.getItem('marcadores')));
       $.ajax({
-        url:canales[posicion].url,
+        url:consultar_canal[posicion].url,
         success:function(datos){
           let salida='';
           salida+='<h4>Hay '+datos.query.count+' noticias.</h4>';
@@ -166,7 +159,7 @@ $(document).ready(
             }
           }
           salida+='</ol>';
-          $("#lector").html(salida);
+          $("#listado_noticias").html(salida);
         },
         timeout: 5000,
         error:function(xhr, ajaxOptions, thrownError){
@@ -177,6 +170,28 @@ $(document).ready(
         }
       });
     }
+
+
+
+
+
+    function crear_select_favoritos(){
+      let panel = $('#contenedor_favoritos');
+      canales = (JSON.parse(localStorage.getItem('marcadores')) || []);
+      let html = '';
+      if(canales.length == 0){
+        panel.html('<h3 class="center">Aun no se ha añadido ningún alimentador a favoritos</h3>')
+      }else {
+        html += '<select id="select_favoritos" class="browser-default">'
+        for (let i=0; i< canales.length; i++) {
+          html += '<option value="'+i+'">'+canales[i].nombre+'</option>';
+        }
+        html +='</select>'
+        panel.html(html);
+      }
+    }
+
+
 
 
     /*
@@ -308,7 +323,6 @@ $(document).ready(
 
     });
 
-
     $('#boton_test').on('click', function(){
       let html='<div class="preloader-wrapper active"><div class="spinner-layer spinner-red-only">      <div class="circle-clipper left"><div class="circle"></div></div><div class="gap-patch"><div class="circle"></div>      </div><div class="circle-clipper right"><div class="circle"></div></div></div></div>';
 
@@ -363,9 +377,41 @@ $(document).ready(
 
     // al hacer click en el botón consultar...
     $("#boton_consultar").on("click", function(){
-      let pos = +$("#select_canal").val();
+      let pos = +$("#select_favoritos").val();
       mostrarCanal(pos);
     });
+
+
+    //Genera el select con los canales favoritos
+    $('#menu_alimentadores').on('click',function (){
+      crear_select_favoritos();
+    });
+
+
+
+
+
+
+
+    //Funcion que mete el canal predefinido seleccionado en ese momendo
+    //y lo mete en 'marcadores' para usarlo en la pestaña favoritos
+    $('#boton_add_channel_predeterminado').on('click',function(){
+      let pos = +$("#select_canal").val();
+      let canales_add = (JSON.parse(localStorage.getItem('marcadores')) || []);
+      predefinidos = (JSON.parse(localStorage.getItem('predefinidos')));
+
+      if(comprobarNombreURl(predefinidos[pos].url,predefinidos[pos].nombre)){
+        canales_add.push(predefinidos[pos]);
+        localStorage.setItem('marcadores', JSON.stringify(canales_add));
+        alert("Canal añadido a favoritos")
+      }
+      else {
+        alert("Este canal ya está en favoritos")
+      }
+    });
+
+
+
 
     // al hacer click en el botón borrar...
     // este evento elimina del array de canales el seleccionado
@@ -384,6 +430,6 @@ $(document).ready(
       let pos = +$("#select_canal").val();
       canales[pos].nombre=$("#input_nombre").val();
       localStorage.setItem('marcadores', JSON.stringify(canales) );
-      cargarCanales();
+      crear_select_favoritos();
     });
   });

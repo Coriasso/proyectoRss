@@ -23,7 +23,7 @@
 
     <ul id="dropdown_alimentadores" class="dropdown-content">
       <li><a href="#!" id="menu_alimentadores">Favoritos</a></li>
-      <li><a href="#!" id="menu_favoritos">Predefinidos</a></li>
+      <li><a href="#!" id="menu_favoritos"  data-target="modal_predeterminados" class="modal-trigger">Predefinidos</a></li>
       <li class="divider"></li>
     </ul>
 
@@ -39,25 +39,49 @@
       </div>
     </nav>
 
-    <ul class="sidenav" id="movil_colapsado">
-      <li><a href="sass.html">Sass</a></li>
+<!--  <ul class="sidenav" id="movil_colapsado">
+      <li><a class="dropdown-trigger" href="#!" data-target="dropdown_alimentadores">Alimentadores</a></li>
       <li><a href="badges.html">Components</a></li>
       <li><a href="collapsible.html">Javascript</a></li>
       <li><a href="mobile.html">Mobile</a></li>
-    </ul>
+    </ul> -->
 
     <div id="panel_alimentadores" class="panel" hidden>
       <h1 class="center">Lista de alimentadores</h1>
+      <div id="contenedor_favoritos"></div>
+      <a id="boton_consultar" class="waves-effect waves-light btn">Consultar</a>
+      <a id="boton_editar" class="waves-effect waves-light btn">Editar</a>
 
+      <div id="listado_noticias"></div>
     </div>
 
-    <div id="panel_favoritos" class="panel" hidden>
-      <div class="input-field col s12">
-        <select id="select_canal">
-        </select>
-        <label>Materialize Select</label>
-      </div>
 
+
+    <div id="modal_predeterminados" class="modal">
+      <div class="modal-content">
+        <h5>Añadir canal predeterminado</h5>
+        <div class="input-field col s12">
+          <select id="select_canal" class="browser-default">
+          </select>
+        </div>
+      <a id="boton_add_channel_predeterminado" class="waves-effect waves-light btn">Añadir</a>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="#e53935 red darken-1 modal-action modal-close waves-effect waves-green btn-flat">Cerrar</a>
+      </div>
+    </div>
+
+    <div id="modal_editar_nombre" class="modal">
+      <div class="modal-content">
+        <h5>Modificar nombre</h5>
+        <div id="modificador_canal" class="input-field col s12">
+          <input type="text" id="nuevo_nombre" placeholder="Escribe el nuevo nombre"></input>
+        </div>
+      <a id="boton_actualizar" class="waves-effect waves-light btn">Añadir</a>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="#e53935 red darken-1 modal-action modal-close waves-effect waves-green btn-flat">Cerrar</a>
+      </div>
     </div>
 
   </div>
