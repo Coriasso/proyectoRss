@@ -21,76 +21,165 @@
 <body>
   <div class="container">
 
-    <ul id="dropdown_alimentadores" class="dropdown-content">
-      <li><a href="#!" id="menu_alimentadores">Favoritos</a></li>
-      <li><a href="#!" id="menu_favoritos"  data-target="modal_predeterminados" class="modal-trigger">Predefinidos</a></li>
-      <li class="divider"></li>
-    </ul>
+
 
     <nav>
       <div class="nav-wrapper">
-        <a href="#" class="centered brand-logo">Logo</a>
+        <a href="#" class=" brand-logo">Lector Rss</a>
         <a href="#" data-target="movil_colapsado" class="sidenav-trigger"><i class="material-icons">menu</i></a>
         <ul id="nav-mobile" class="right hide-on-med-and-down">
-          <li><a class="dropdown-trigger" href="#!" data-target="dropdown_alimentadores">Alimentadores</a></li>
-          <li><a href="badges.html">Components</a></li>
-          <li><a href="collapsible.html">JavaScript</a></li>
+          <li><a href="#!" id="menu_alimentadores">Favoritos</a></li>
+          <li><a href="#!" id="boton_modal_favoritos" data-target="modal_predeterminados" class="modal-trigger">Predefinidos</a></li>
+          <li><a href="#!" id="boton_modal_personalizado">Personalizado</a></li>
+          <li><a href="#!" id="menu_ayuda">Ayuda</a></li>
+          <li><a href="#!" id="menu_acercade">Acerca de</a></li>
         </ul>
       </div>
     </nav>
 
-<!--  <ul class="sidenav" id="movil_colapsado">
-      <li><a class="dropdown-trigger" href="#!" data-target="dropdown_alimentadores">Alimentadores</a></li>
-      <li><a href="badges.html">Components</a></li>
-      <li><a href="collapsible.html">Javascript</a></li>
-      <li><a href="mobile.html">Mobile</a></li>
-    </ul> -->
+    <ul class="sidenav" id="movil_colapsado">
+      <li><a href="#!" id="men_alimentadores_copalsado">Favoritos</a></li>
+      <li><a href="#!" id="boton_modal_favoritos_colapsado" data-target="modal_predeterminados" class="modal-trigger">Predefinidos</a></li>
+      <li><a href="#!" id="boton_modal_personalizado_colapsado" data-target="modal_personalizar">Personalizado</a></li>
+      <li><a href="#!" id="men_ayuda_copalsado">Ayuda</a></li>
+      <li><a href="#!" id="men_acercade_copalsado">Acerca de</a></li>
+
+    </ul>
+
+
+
+
 
     <div id="panel_alimentadores" class="panel" hidden>
       <h1 class="center">Lista de alimentadores</h1>
       <div id="contenedor_favoritos"></div>
-      <a id="boton_consultar" class="waves-effect waves-light btn">Consultar</a>
-      <a id="boton_editar" class="waves-effect waves-light btn">Editar</a>
-
+      <br>
+      <div id="contenedor_botones_alimentadores">
+        <a id="boton_consultar" class="waves-effect waves-light btn">Consultar</a>
+        <a id="boton_editar" class="waves-effect waves-light btn">Editar</a>
+        <a id="boton_borrar_modal" class="waves-effect waves-light btn right #b71c1c red darken-4">Borrar</a>
+      </div>
+      <br>
       <div id="listado_noticias"></div>
     </div>
 
 
-
+    <!--Modal con los canales predeterminados -->
     <div id="modal_predeterminados" class="modal">
       <div class="modal-content">
         <h5>Añadir canal predeterminado</h5>
         <div class="input-field col s12">
-          <select id="select_canal" class="browser-default">
+          <select id="select_canal_predefinidos" class="browser-default">
           </select>
         </div>
-      <a id="boton_add_channel_predeterminado" class="waves-effect waves-light btn">Añadir</a>
+        <a id="boton_add_channel_predeterminado" class="waves-effect waves-light btn">Añadir</a>
       </div>
       <div class="modal-footer">
         <a href="#!" class="#e53935 red darken-1 modal-action modal-close waves-effect waves-green btn-flat">Cerrar</a>
       </div>
     </div>
 
+
+
+
+    <!-- Modal para editar el nombre -->
     <div id="modal_editar_nombre" class="modal">
       <div class="modal-content">
         <h5>Modificar nombre</h5>
         <div id="modificador_canal" class="input-field col s12">
           <input type="text" id="nuevo_nombre" placeholder="Escribe el nuevo nombre"></input>
         </div>
-      <a id="boton_actualizar" class="waves-effect waves-light btn">Añadir</a>
+        <a id="boton_actualizar" class="waves-effect waves-light btn">Cambiar</a>
       </div>
       <div class="modal-footer">
         <a href="#!" class="#e53935 red darken-1 modal-action modal-close waves-effect waves-green btn-flat">Cerrar</a>
       </div>
     </div>
 
-  </div>
+    <!-- Modal con la confirmacion para borrar un canal de favoritos -->
+
+    <div id="modal_confirmar_borrar" class="modal">
+      <div class="modal-content">
+        <div id="confirmacion_borrado" class="input-field col s12">
+        </div>
+        <a id="boton_borrar_confirmar" class="#e53935 red darken-1 waves-effect waves-light btn">Confirmar</a>
+        <a href="#!" class=" waves-effect waves-light btn right modal-action modal-close  waves-green  right">Cancelar</a>
+      </div>
+      <div class="modal-footer">
+      </div>
+    </div>
+
+
+    <!--Modal para añadir un alimentador personalizado -->
+
+    <div id="modal_personalizar" class="modal">
+      <div class="modal-content">
+        <h5>Añadir canal</h5>
+        <div class="input-field col s12">
+          <input type="text" id="input_nombre" placeholder="Escribir nombre del canal"></input>
+          <input type="url" id="input_url" placeholder="Introduzca la url"></input>
+          <div id="texto_add_canal"></div>
+        </div>
+        <a id="boton_add_canal_personalizado"class=" waves-effect waves-light btn waves-green">Añadir a favoritos</a>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="#e53935 red darken-1 modal-action modal-close waves-effect waves-green btn-flat">Cerrar</a>
+      </div>
+    </div>
+
+
+    <div id="panel_ayuda" class="panel" hidden>
+      <div class="center text_flow">
+        <h3> Ayuda de la app </h3>
+      </div>
+      <div class="text_flow">
+        <h5> Favoritos </h5>
+        <p> En la pestaña de favoritos se podrá ver un listado de los canales que hayas añadido. </p>
+        <p> Una vez haya canales añadidos podrás consultar sus tituales usando el botón <strong>Consultar</strong> para generar la lista,
+          el botón <strong>Editar</strong> para cambiar el nombre (no se permite el repetir nombres), y, por último, el botón <strong> Borrar</strong>
+          que sirve para borrar el canal. Nota: los canales predeterminados pueden ser borrados de favoritos, pero no se su propia lista</p>
+          <br>
+          <h5> Prefefinidos </h5>
+          <p> Listado de 10 canales de noticias variados para enlazar directamente a tus favoritos</p>
+          <br>
+          <h5> Personalizado </h5>
+          <p>Aquí se permite introducir un alimentador propio.</p>
+          <p>Se permiten tanto canales <strong>RSS</strong> como canales <strong>ATOM</strong>. No se permite dejar el nombre en blanco, ni usar
+            un nombre o url que ya esté en uso </p>
+            <p>Nótese que el botón de añadir se bloquea mientras se procesa la petición para evitar duplicados al pulsar varias veces. Se volverá a habilitar
+              cuando termine de guardarse el canal o cuando se cierre la pestaña</p>
+              <br>
+            </div>
+
+          </div>
+
+          <div id="panel_acercade" class="panel" hidden>
+            <div class="center text_flow">
+              <h3> Alumno </h3>
+              <p>Jorge Sánchez Coriasso </p>
+              <p>1º de Desarrollo de Aplicaciones Multiplataforma </p>
+              <p>Lenguaje de Marcas y Sistemas de Gestión de la Información </p>
+              <p>Curso 2017/2018 </p>
+            </div>
+
+
+          </div>
 
 
 
 
 
 
-</body>
 
-</html>
+
+
+        </div>
+
+
+
+
+
+
+      </body>
+
+      </html>

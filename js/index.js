@@ -14,10 +14,15 @@ $(document).ready(
     $('.tabs').tabs();
     $('select').formSelect();
     $(".dropdown-trigger").dropdown();
-    $('#select_canal').formSelect();
+
+
 
     var modal_predeterminados = M.Modal.getInstance($('#modal_predeterminados'));
     var modal_editar = M.Modal.getInstance($('#modal_editar_nombre'));
+    var modal_borrar = M.Modal.getInstance($('#modal_confirmar_borrar'));
+    var modal_personalizado = M.Modal.getInstance($('#modal_personalizar'));
+    var sidenav_comprimido = M.Sidenav.getInstance($('#movil_colapsado'));
+
 
 
     $('[id^="menu_"]').each(function () {
@@ -29,15 +34,22 @@ $(document).ready(
         $(".panel").hide();
         $("#" + panel_id).show();
       });
-      console.log("id_menu::" + menu_id + "  id_panel" + panel_id);
+      //  console.log("id_menu::" + menu_id + "  id_panel" + panel_id);
     });
 
     $(".panel").hide();
 
+    $("#contenedor_botones_alimentadores").hide();
 
-    //Funcion simple para abrir el modal al pulsar en el elemento de la lista con dicho id
-    $('#menu_favoritos').on('click', function(){
+    //Funcion simple para abrir el modal al pulsar en el elemento de la lista con dicho id y esconder el sidenav
+    $('#boton_modal_favoritos').on('click', function(){
       modal_predeterminados.open();
+
+    });
+    $('#men_alimentadores_copalsado').on('click', function(){
+      $('.panel').hide();
+      sidenav_comprimido.close();
+      $('#panel_alimentadores').show();
     });
 
 
@@ -45,10 +57,42 @@ $(document).ready(
       modal_editar.open();
     });
 
+    $('#boton_borrar_modal').on("click", function(){
+      //Coge lo que hay entro de las etiquetas html de la opcion seleccionada en ese momento
+      let nombre = $("#select_favoritos>option:selected").html()
 
+      let html="<h5>¿Seguro que quiere borrar el canal "+ nombre +" ?</h5>"
+      $('#confirmacion_borrado').html(html);
 
+      modal_borrar.open();
+    });
+    //Además de lo anterior también resetea el modal, borrando los datos introducidos
+    $('#boton_modal_personalizado').on("click", function(){
+      $('#boton_add_canal_personalizado').removeClass("disabled");
+      $('#input_nombre').val("");
+      $('#input_url').val("");
+      $('#texto_add_canal').html("");
+      modal_personalizado.open();
+    });
+    $('#boton_modal_personalizado_colapsado').on("click", function(){
+      $('#boton_add_canal_personalizado').removeClass("disabled");
+      $('#input_nombre').val("");
+      $('#input_url').val("");
+      $('#texto_add_canal').html("");
+      modal_personalizado.open();
+    });
 
+    $('#men_ayuda_copalsado').on("click", function(){
+      $('.panel').hide();
+      sidenav_comprimido.close();
+      $('#panel_ayuda').show();
+    });
 
+    $('#men_acercade_copalsado').on("click", function(){
+      $('.panel').hide();
+      sidenav_comprimido.close();
+      $('#panel_acercade').show();
+    });
 
 
     ////****Fin de js de materialize****\\\\\
@@ -130,21 +174,26 @@ $(document).ready(
     // esta función carga de localStorage los canales disponibles y
     // actualiza el SELECT con la lista de canales
     function cargarCanalesPredefinidos(){
-      let select = $('#select_canal');
-      select.empty();
-      let opcion = '';
-      for (let i=0; i< predefinidos.length; i++) {
-        opcion += '<option value="'+i+'">'+predefinidos[i].nombre+'</option>';
+      predefinidos = JSON.parse(localStorage.getItem('predefinidos'))
+      if(predefinidos != null){
+        let select = $('#select_canal_predefinidos');
+        select.empty();
+        let opcion = '';
+        for (let i=0; i< predefinidos.length; i++) {
+          opcion += '<option value="'+i+'">'+predefinidos[i].nombre+'</option>';
+        }
+        select.html(opcion);
       }
-      select.html(opcion);
-
     }
     // llamamos a la función para forzar su ejecución al cargar la página
     cargarCanalesPredefinidos();
-
     // mostrar un canal del array
     function mostrarCanal(posicion){
+      let html='<div class="progress"><div class="indeterminate"></div></div>';
+
+      $('#listado_noticias').html(html);
       let consultar_canal = (JSON.parse(localStorage.getItem('marcadores')));
+
       $.ajax({
         url:consultar_canal[posicion].url,
         success:function(datos){
@@ -165,7 +214,7 @@ $(document).ready(
         error:function(xhr, ajaxOptions, thrownError){
           let salida = "<h4>Error: No hay conexión a Internet</h4>";
           salida += "<p>Compruebe su conexión e inténtelo de nuevo</p>";
-          $("#lector").html(salida);
+          $("#listado_noticias").html(salida);
           salida += "<p>Error códido: "+xhr.status+"</p>";
         }
       });
@@ -179,17 +228,25 @@ $(document).ready(
       let panel = $('#contenedor_favoritos');
       canales = (JSON.parse(localStorage.getItem('marcadores')) || []);
       let html = '';
+      $('#panel_alimentadores').show();
       if(canales.length == 0){
         panel.html('<h3 class="center">Aun no se ha añadido ningún alimentador a favoritos</h3>')
-      }else {
+        $('#contenedor_botones_alimentadores').hide();
+        $('#listado_noticias').html("");
+      }
+      else {
         html += '<select id="select_favoritos" class="browser-default">'
         for (let i=0; i< canales.length; i++) {
           html += '<option value="'+i+'">'+canales[i].nombre+'</option>';
         }
         html +='</select>'
         panel.html(html);
+
+        $('#contenedor_botones_alimentadores').show();
+
       }
     }
+    crear_select_favoritos();
 
 
 
@@ -204,18 +261,18 @@ $(document).ready(
 
       canales = JSON.parse(localStorage.getItem('marcadores'));
       if(!nombreCanal){
-        $('#notificacio_add_canal').html("<h5> No se puede dejar el nombre en blanco </h5>");
+        $('#texto_add_canal').html("<h5> No se puede dejar el nombre en blanco </h5>");
         return resultado = false;
       }
       //Si no hay canales en el localStorage se salta la comprobación de estar repetidos
       if(canales != null){
         for (var i = 0; i < canales.length; i++) {
           if(canales[i].nombre == nombreCanal){
-            $('#notificacio_add_canal').html("<h5> Nombre ya en uso</h5>");
+            $('#texto_add_canal').html("<h5> Nombre ya en uso</h5>");
             return resultado = false;
           }
           if(canales[i].url == urlCanal){
-            $('#notificacio_add_canal').html("<h5> URL ya en uso</h5>");
+            $('#texto_add_canal').html("<h5> URL ya en uso</h5>");
             return resultado = false;
           }
 
@@ -246,94 +303,21 @@ $(document).ready(
         };
         marcadores.push(marcador);
         localStorage.setItem('marcadores', JSON.stringify(marcadores) );
-        cargarCanales();
+        crear_select_favoritos();
       } else {
         returnValue=false;
       }
       return returnValue;
     }
 
-    // ejemplo de consulta:
-    // https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20rss%20where%20url%3D'http%3A%2F%2Fwww.ideal.es%2Frss%2F2.0%2Fportada'&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys
 
-
-    // primera versión del lector, al pulsar sobre el botón RSS
-    // leemos la URL del formulario y cargamos el canal RSS
-    $('#boton_rss').on('click', function(){
-      let html='Cargando datos...';
-      let consulta = '';
-      consulta += 'https://query.yahooapis.com/v1/public/yql?q=';
-      consulta += "select * from rss where url='"+$('#input_url').val()+"'&format=json";
-      consulta = encodeURI(consulta);
-      $("#lector").html(html);
-
-      $.ajax({
-        url:consulta,
-        success:function(datos){
-          let salida='';
-          salida+='<h4>Hay '+datos.query.count+' noticias.</h4>';
-          salida+='<ol>';
-          for (let i=0; i<datos.query.count; i++){
-            salida+='<li>'+datos.query.results.item[i].title +'</li>';
-          }
-          salida+='</ol>';
-          $("#lector").html(salida);
-        },
-        timeout: 5000,
-        error:function(xhr, ajaxOptions, thrownError){
-          let salida = "<h4>Error: No hay conexión a Internet</h4>";
-          salida += "<p>Compruebe su conexión e inténtelo de nuevo</p>";
-          $("#lector").html(salida);
-          salida += "<p>Error códido: "+xhr.status+"</p>";
-        }
-      });
-
-    });
-
-    // primera versión del lector, al pulsar sobre el botón ATOM
-    // leemos la URL del formulario y cargamos el canal ATOM
-    $('#boton_atom').on('click', function(){
-      let html='Cargando datos...';
-      let consulta = '';
-      consulta += 'https://query.yahooapis.com/v1/public/yql?q=';
-      consulta += "select * from atom where url='"+$('#input_url').val()+"'&format=json";
-      consulta = encodeURI(consulta);
-      $("#lector").html(html);
-
-      $.ajax({
-        url:consulta,
-        success:function(datos){
-          let salida='';
-          salida+='<h4>Hay '+datos.query.count+' noticias.</h4>';
-          salida+='<ol>';
-          for (let i=0; i<datos.query.count; i++){
-            salida+='<li>'+datos.query.results.entry[i].title +'</li>';
-          }
-          salida+='</ol>';
-          $("#lector").html(salida);
-        },
-        timeout: 5000,
-        error:function(xhr, ajaxOptions, thrownError){
-          let salida = "<h4>Error: No hay conexión a Internet o la url no es válida</h4>";
-          salida += "<p>Compruebe su conexión e inténtelo de nuevo</p>";
-          $("#notificacio_add_canal").html(salida);
-          salida += "<p>Error códido: "+xhr.status+"</p>";
-        }
-      });
-
-    });
-
-    $('#boton_test').on('click', function(){
-      let html='<div class="preloader-wrapper active"><div class="spinner-layer spinner-red-only">      <div class="circle-clipper left"><div class="circle"></div></div><div class="gap-patch"><div class="circle"></div>      </div><div class="circle-clipper right"><div class="circle"></div></div></div></div>';
-
-
+    $('#boton_add_canal_personalizado').on('click', function(){
       let url =  'https://query.yahooapis.com/v1/public/yql?q=';
       url += 'select * from rss where url="'+ $("#input_url").val() +'"&format=json';
       url = encodeURI(url);
 
       if(comprobarNombreURl(url,$("#input_nombre").val())){
-
-
+        $('#boton_add_canal_personalizado').addClass("disabled")
         $.ajax({
           url: url,
           success: function(datos){
@@ -341,7 +325,8 @@ $(document).ready(
             if (datos.query.count>0) { // es RSS
 
               salvarCanal(url, "RSS", $("#input_nombre").val());
-              $("#notificacio_add_canal").html("<h4> Canal RSS almacenado </h4>");
+              $("#texto_add_canal").html("<h4> Canal RSS almacenado </h4>");
+              $('#boton_add_canal_personalizado').removeClass("disabled");
             }
 
             else {
@@ -354,12 +339,14 @@ $(document).ready(
                 success: function(datosAtom){
                   if (datosAtom.query.count>0) { // es ATOM
                     salvarCanal(url, "ATOM", $("#input_nombre").val());
-                    $("#notificacio_add_canal").html("<h4> Canal ATOM almacenado </h4>");
+                    $("#texto_add_canal").html("<h4> Canal ATOM almacenado </h4>");
+                    $('#boton_add_canal_personalizado').removeClass("disabled");
                   }
                 },
                 timeout: 4000,
                 error: function(error){
-                  $("#lector").html("<h4>Sin conexión a Internet </h4>");
+                  $("#texto_add_canal").html("<h4>Sin conexión a Internet </h4>");
+                  $('#boton_add_canal_personalizado').removeClass("disabled");
                 }
               });
             }
@@ -368,12 +355,12 @@ $(document).ready(
           },
           timeout: 4000,
           error: function (error){
-            $("#notificacio_add_canal").html("<h4>Sin conexión a Internet</h4>");
+            $("#texto_add_canal").html("<h4>Sin conexión a Internet</h4>");
           }
         });
       }
-      $("#notificacio_add_canal").html("URL no válida");
     });
+
 
     // al hacer click en el botón consultar...
     $("#boton_consultar").on("click", function(){
@@ -388,48 +375,56 @@ $(document).ready(
     });
 
 
-
-
-
-
-
     //Funcion que mete el canal predefinido seleccionado en ese momendo
     //y lo mete en 'marcadores' para usarlo en la pestaña favoritos
     $('#boton_add_channel_predeterminado').on('click',function(){
-      let pos = +$("#select_canal").val();
+      let pos = +$("#select_canal_predefinidos").val();
       let canales_add = (JSON.parse(localStorage.getItem('marcadores')) || []);
-      predefinidos = (JSON.parse(localStorage.getItem('predefinidos')));
+      let predefinidos_add = (JSON.parse(localStorage.getItem('predefinidos')));
 
-      if(comprobarNombreURl(predefinidos[pos].url,predefinidos[pos].nombre)){
-        canales_add.push(predefinidos[pos]);
+      if(comprobarNombreURl(predefinidos_add[pos].url,predefinidos_add[pos].nombre)){
+        canales_add.push(predefinidos_add[pos]);
         localStorage.setItem('marcadores', JSON.stringify(canales_add));
-        alert("Canal añadido a favoritos")
+        //  alert("Canal añadido a favoritos")
+        M.toast({html: 'Canal añadido a favoritos'})
+        crear_select_favoritos();
       }
       else {
-        alert("Este canal ya está en favoritos")
+        //  alert("Este canal ya está en favoritos")
+        M.toast({html: "Este canal ya está en favoritos"})
       }
     });
 
 
-
-
-    // al hacer click en el botón borrar...
-    // este evento elimina del array de canales el seleccionado
-    // y actualiza la lista tanto en el SELECT como en localStorage
-    $("#boton_borrar").on("click", function(){
-      let pos = +$("#select_canal").val();
-      canales.splice(pos, 1);
-      localStorage.setItem('marcadores', JSON.stringify(canales) );
-      cargarCanales();
-    });
 
     // al hacer click con el botón actualizar...
     // este evento actualiza con el texto del INPUT para el nombre
     // del alimentador el canal seleccionado.
     $("#boton_actualizar").on("click", function(){
-      let pos = +$("#select_canal").val();
-      canales[pos].nombre=$("#input_nombre").val();
-      localStorage.setItem('marcadores', JSON.stringify(canales) );
-      crear_select_favoritos();
+      let pos = +$("#select_favoritos").val();
+
+      if($("#nuevo_nombre").val()){
+        canales[pos].nombre=$("#nuevo_nombre").val();
+        $("#nuevo_nombre").val("");
+        modal_editar.close();
+        localStorage.setItem('marcadores', JSON.stringify(canales) );
+        crear_select_favoritos();
+      }
+      else {
+        M.toast({html: 'Nombre vacío'});
+      }
     });
+
+
+    $("#boton_borrar_confirmar").on("click", function(){
+      canales = JSON.parse(localStorage.getItem('marcadores'))
+      let pos = +$("#select_favoritos").val();
+      canales.splice(pos, 1);
+      localStorage.setItem('marcadores', JSON.stringify(canales) );
+      M.toast({html: 'Canal borrado'})
+      crear_select_favoritos();
+      modal_borrar.close();
+    });
+
+
   });
